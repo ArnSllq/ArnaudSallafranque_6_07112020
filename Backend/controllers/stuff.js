@@ -1,14 +1,18 @@
-const Sauces = require('../models/thing');
+const Sauces = require('../models/Thing');
 
-exports.addSauce = (req, res, next) => {
+exports.createSauce = (req, res, next) => {
+  const sauceObject = JSON.parse(req.body.sauce);
+  delete sauceObject._id;
   const sauce = new Sauces({
+    ...sauceObject,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     // userId: req.body.userId,
-    name: req.body.name,
-    manufacturer: req.body.manufacturer,
-    description: req.body.description,
-    mainPeper: req.body.description,
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-    heat: req.body.heat,
+    // name: req.body.name,
+    // manufacturer: req.body.manufacturer,
+    // description: req.body.description,
+    // mainPeper: req.body.description,
+    // imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+    // heat: req.body.heat,
   });
   sauce.save().then(
     () => {
