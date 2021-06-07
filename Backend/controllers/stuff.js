@@ -2,17 +2,13 @@ const Sauces = require('../models/thing');
 
 exports.addSauce = (req, res, next) => {
   const sauce = new Sauces({
-    userId: req.body.userId,
+    // userId: req.body.userId,
     name: req.body.name,
     manufacturer: req.body.manufacturer,
     description: req.body.description,
     mainPeper: req.body.description,
-    imageUrl: req.body.imageUrl,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
     heat: req.body.heat,
-    likes: req.body.likes,
-    dislikes: req.body.dislikes,
-    usersLiked: req.body.usersLiked,
-    usersDisliked: req.body.usersDisliked
   });
   sauce.save().then(
     () => {
@@ -28,13 +24,12 @@ exports.addSauce = (req, res, next) => {
     }
   );
 };
-//test pour git
 
 exports.getOneThing = (req, res, next) => {
-  Thing.findOne({
+  Sauces.findOne({
     _id: req.params.id
   }).then(
-    (thing) => {
+    (sauce) => {
       res.status(200).json(thing);
     }
   ).catch(
@@ -87,7 +82,7 @@ exports.deleteThing = (req, res, next) => {
 };
 
 exports.getAllStuff = (req, res, next) => {
-  Thing.find().then(
+  Sauces.find().then(
     (things) => {
       res.status(200).json(things);
     }
