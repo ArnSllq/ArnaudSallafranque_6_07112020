@@ -23,12 +23,56 @@ exports.createSauce = (req, res, next) => {
   );
 };
 
-exports.likeSauce = (req, res, next) => {
-  const sauce = new Sauces({
-    like: req.body.like
+exports.likeSauce = async (req, res, next) => {
+  const sauce = await Sauces.findById(req.params.id)
+  const arrayUsersLikes = sauce.usersLiked
+  const arrayUsersDislikes = sauce.usersDisliked
+  let nbLike = 0
+  let nbDislike = 0
+  if(sauce.likes === undefined){
+    sauce.likes = 0
+  }
+  if(sauce.dislikes === undefined){
+    sauce.dislikes = 0
+  }
 
-  });
+  switch (req.body.like) {
+    case -1:
+      nbLike = parseInt(sauce.likes)
+      nbDislike = parseInt(sauce.dislikes) + 1
+      arrayUsersDislikes.push(req.body.userId)
+      if(arrayUsersLikes.indexOf(req.body.userId) != -1){
+        arrayUsersLikes.splice(arrayUsersLikes.indexOf(req.body.userId), 1)
+      }
+      break;
+    case 0:
+      if(arrayUsersLikes.indexOf(req.body.userId) != -1){
+        arrayUsersLikes.splice(arrayUsersLikes.indexOf(req.body.userId), 1)
+        nbLike = parseInt(sauce.likes) - 1
+        nbDislike = parseInt(sauce.dislikes)
+      }
+      if(arrayUsersDislikes.indexOf(req.body.userId) != -1){
+        arrayUsersDislikes.splice(arrayUsersDislikes.indexOf(req.body.userId), 1)
+        nbDislike = parseInt(sauce.dislikes) - 1
+        nbLike = parseInt(sauce.likes)
+      }
+      break;
+    case 1:
+      nbLike = parseInt(sauce.likes) + parseInt(req.body.like)
+      nbDislike = parseInt(sauce.dislikes)
+      arrayUsersLikes.push(req.body.userId)
+      if(arrayUsersDislikes.indexOf(req.body.userId) != -1){
+        arrayUsersDislikes.splice(arrayUsersDislikes.indexOf(req.body.userId), 1)
+      }
+      break;
+      
+    default:
+      break;
+  }
 
+  Sauces.updateOne({ _id: req.params.id}, { likes: nbLike, usersLiked: arrayUsersLikes, dislikes: nbDislike, usersDisliked: arrayUsersDislikes})
+.then(() => res.status(200).json({ message: 'Objet modifié !'}))
+.catch(error => res.status(400).json({ error }));
 };
 
 exports.getOneThing = (req, res, next) => {
@@ -45,6 +89,14 @@ exports.getOneThing = (req, res, next) => {
       });
     }
   );
+};
+
+exports.getOneThing = (req, res, next) => {
+  Sauces.findOne({
+    _id: req.params.id
+  }).then((sauces) => {res.status(200).json(sauces);
+    }).catch((error) => {res.status(404).json({error: error});
+});
 };
 
 exports.modifyThing = (req, res, next) => {
