@@ -1,12 +1,15 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
 const User = require('../models/User')
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
+const cryptoJS = require('crypto-js')
+
+let salt = cryptoJS.lib.WordArray.random(128/8);
 
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
-          email: req.body.email,
+          email: cryptoJS.DES.encrypt(req.body.email, "Secret Passphrase"),
           password: hash
         });
         user.save()
@@ -17,7 +20,9 @@ exports.signup = (req, res, next) => {
   };
 
   exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+    let EM = cryptoJS.DES.encrypt(email, "Secret Passphrase");
+    // bcrypt.compare(req.body.email, user.email)
+    User.findOne({ email : req.body.email })
       .then(user => {
         if (!user) {
           return res.status(401).json({ error: 'Utilisateur non trouvé !' });
