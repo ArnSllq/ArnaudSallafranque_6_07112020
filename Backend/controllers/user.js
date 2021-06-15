@@ -3,15 +3,17 @@ const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const cryptoJS = require('crypto-js')
 const dotenv = require('dotenv')
+
 let iv = cryptoJS.enc.Hex.parse(''+process.env.AES_IV+'');
 let key = cryptoJS.enc.Hex.parse(''+process.env.AES_KEY+'');
 
+dotenv.config()
+
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
-      .then(hash => {
-        let encrypted = cryptoJS.AES.encrypt(req.body.email, key, {iv: iv});
+      .then(hash => {;
         const user = new User({
-          email: encrypted,
+          email: cryptoJS.AES.encrypt(req.body.email, key, {iv: iv}),
           password: hash
         });
         user.save()
@@ -22,9 +24,6 @@ exports.signup = (req, res, next) => {
   };
 
   exports.login = (req, res, next) => {
-    //let EM = cryptoJS.DES.encrypt(email, "Secret Passphrase");
-    // bcrypt.compare(req.body.email, user.email)
-    // let encryptedED = cryptoJS.AES.decrypt(User.email, key, {iv: iv});
     User.findOne({ email: cryptoJS.AES.encrypt(req.body.email, key, {iv: iv})})
       .then(user => {
         if (!user) {
