@@ -1,6 +1,7 @@
 const Sauces = require('../models/ScsPecko');
 const fs = require('fs');
 
+// Création d'une sauce
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -22,7 +23,7 @@ exports.createSauce = (req, res, next) => {
     }
   );
 };
-
+// Gestion des likes / dislikes
 exports.likeSauce = async (req, res, next) => {
   const sauce = await Sauces.findById(req.params.id)
   const arrayUsersLikes = sauce.usersLiked
@@ -35,8 +36,9 @@ exports.likeSauce = async (req, res, next) => {
   if(sauce.dislikes === undefined){
     sauce.dislikes = 0
   }
-
+// Partie qui gère à proprement parler, l'ajout/la suppression des likes et des dislikes sur une sauce
   switch (req.body.like) {
+    // cas d'un dislike
     case -1:
       nbLike = parseInt(sauce.likes)
       nbDislike = parseInt(sauce.dislikes) + 1
@@ -45,6 +47,7 @@ exports.likeSauce = async (req, res, next) => {
         arrayUsersLikes.splice(arrayUsersLikes.indexOf(req.body.userId), 1)
       }
       break;
+      // cas neutre, l'utilisateur n'a ni like, ni dislike la sauce
     case 0:
       if(arrayUsersLikes.indexOf(req.body.userId) != -1){
         arrayUsersLikes.splice(arrayUsersLikes.indexOf(req.body.userId), 1)
@@ -57,6 +60,7 @@ exports.likeSauce = async (req, res, next) => {
         nbLike = parseInt(sauce.likes)
       }
       break;
+      // cas d'un like
     case 1:
       nbLike = parseInt(sauce.likes) + parseInt(req.body.like)
       nbDislike = parseInt(sauce.dislikes)
@@ -69,12 +73,11 @@ exports.likeSauce = async (req, res, next) => {
     default:
       break;
   }
-
 Sauces.updateOne({ _id: req.params.id}, { likes: nbLike, usersLiked: arrayUsersLikes, dislikes: nbDislike, usersDisliked: arrayUsersDislikes})
 .then(() => res.status(200).json({ message: 'Objet modifié !'}))
 .catch(error => res.status(400).json({ error }));
 };
-
+// Affichage d'une sauce
 exports.getOneSauce = (req, res, next) => {
   Sauces.findOne({
     _id: req.params.id
@@ -82,7 +85,7 @@ exports.getOneSauce = (req, res, next) => {
   }).catch((error) => {res.status(404).json({ error });
   });
 };
-
+// Modification d'une sauce
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file ?
     {
@@ -93,7 +96,7 @@ exports.modifySauce = (req, res, next) => {
     .then(() => res.status(200).json({ message: 'Objet modifié !'}))
     .catch(error => res.status(400).json({ error }));
 };
-
+// Suppression d'une sauce
 exports.deleteSauce = (req, res, next) => {
   Sauces.findOne({ _id: req.params.id })
     .then(sauce => {
@@ -106,7 +109,7 @@ exports.deleteSauce = (req, res, next) => {
     })
     .catch(error => res.status(500).json({ error }));
 };
-
+// Affichage de toutes les sauces
 exports.getAllSauce = (req, res, next) => {
   Sauces.find().then(
     (sauces) => {res.status(200).json(sauces);
