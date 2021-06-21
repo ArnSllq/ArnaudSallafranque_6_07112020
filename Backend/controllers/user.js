@@ -1,3 +1,4 @@
+//controleurs utilisateurs
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
@@ -8,11 +9,13 @@ let iv = cryptoJS.enc.Hex.parse(''+process.env.AES_IV+'');
 let key = cryptoJS.enc.Hex.parse(''+process.env.AES_KEY+'');
 
 dotenv.config()
-
+// gestion de l'inscription d'un nouvel utilisateur
 exports.signup = (req, res, next) => {
+  // utilisation de bcrypt pour hasher le mot de passe
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
+          // utilisation de crypto-JS pour chiffrer les adresses mail
           email: cryptoJS.AES.encrypt(req.body.email, key, {iv: iv}).toString(),
           password: hash
         });
@@ -22,7 +25,7 @@ exports.signup = (req, res, next) => {
       })
       .catch(error => res.status(500).json({ error }));
   };
-
+// gestion de la connexion d'un utilisateur
   exports.login = (req, res, next) => {
     let encryptedEmail = cryptoJS.AES.encrypt(req.body.email, key, {iv: iv}).toString()
     User.findOne({ email: encryptedEmail})

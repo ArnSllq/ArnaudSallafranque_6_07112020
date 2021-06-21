@@ -1,3 +1,4 @@
+// Ici nous trouvons les routes utilisateurs, pour l'inscription et la connexion
 const express = require('express');
 const router = express.Router();
 

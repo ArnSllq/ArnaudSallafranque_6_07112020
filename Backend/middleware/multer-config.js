@@ -1,3 +1,4 @@
+//Fichier permettant la gestion des fichiers entrants, ici les images
 const multer = require('multer');
 
 const MIME_TYPES = {

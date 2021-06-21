@@ -1,3 +1,4 @@
+// Route pour la création, l'affichage des sauces, d'une sauce, la modification, la suppression et enfin pour les likes / dislikes
 const express = require('express');
 const router = express.Router();
 
