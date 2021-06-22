@@ -4,7 +4,7 @@ const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const cryptoJS = require('crypto-js')
 const dotenv = require('dotenv')
-
+//utilisation de dotenv ici aussi pour protéger les informations de chiffrement voir .env pour 
 let iv = cryptoJS.enc.Hex.parse(''+process.env.AES_IV+'');
 let key = cryptoJS.enc.Hex.parse(''+process.env.AES_KEY+'');
 
